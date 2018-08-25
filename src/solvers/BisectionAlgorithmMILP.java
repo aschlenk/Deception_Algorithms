@@ -25,6 +25,10 @@ public class BisectionAlgorithmMILP {
 	
 	private double maxRuntime;
 
+	/**
+	 * Creates a new instance of the Bisection Algorithm solver for a deception game given as input. 
+	 * @param g
+	 */
 	public BisectionAlgorithmMILP(DeceptionGame g){
 		this.game = g;
 	}

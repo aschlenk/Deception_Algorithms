@@ -1,4 +1,4 @@
-package solvers;
+package OldSolvers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,8 @@ import java.util.Map;
 import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
+import solvers.BisectionAlgorithm;
+import solvers.PureStrategySolver;
 
 public class BBNode implements Comparable {
 

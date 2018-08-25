@@ -26,7 +26,6 @@ public class GameSolver {
 	private Map<Systems, Map<ObservableConfiguration, IloNumVar>> sigmaMap;
 	private Map<Systems, Map<ObservableConfiguration, IloNumVar>> zMap;
 	private IloNumVar dutility;
-	//private Map<ObservableConfiguation, IloNumVar> dMap;
 	
 	private Map<Systems, Map<ObservableConfiguration, Integer>> defenderStrategy;
 	
@@ -48,15 +47,31 @@ public class GameSolver {
 	private boolean setCosts = false;
 	private double milpGap = 0;
 	
+	/**
+	 * Create a new GameSolver instance to solve the deception game as input. 
+	 * @param g
+	 */
 	public GameSolver(DeceptionGame g){
 		this.model = g;
 	}
 	
+	/**
+	 * Create a new GameSolver instance to solve the deception game as input.  Additionally, bounds can be given on the 
+	 * # of machines that can use a certain Observable Configuration (masking). 
+	 * @param g
+	 * @param bounds
+	 */
 	public GameSolver(DeceptionGame g, Map<ObservableConfiguration, Integer> bounds){
 		this.model = g;
 		this.bounds = bounds;
 	}
 	
+	
+	/**
+	 * Function called to solve the optimization model built from the Deception Game instance. 
+	 * Runs cplex to find the optimal solution and saves the relevant information. 
+	 * @throws Exception
+	 */
 	public void solve() throws Exception{
 		defenderStrategy = new HashMap<Systems, Map<ObservableConfiguration, Integer>>();
 		//riskCategoryCoverage = new HashMap<AlertLevel, Map<Base, Double>>();
@@ -106,7 +121,11 @@ public class GameSolver {
 		
 	}
 	
-
+	/**
+	 * Initializes the variables, constraints and objective for the optimization problem and creates the new cplex instance.  
+	 * Additional parameters can be set if there is a desired error tolerance for the MILP or a max runtime. 
+	 * @throws IloException
+	 */
 	private void loadProblem() throws IloException{
 		sigmaMap = new HashMap<Systems, Map<ObservableConfiguration, IloNumVar>>();
 		zMap = new HashMap<Systems, Map<ObservableConfiguration, IloNumVar>>();
@@ -131,6 +150,10 @@ public class GameSolver {
 		initObjective();
 	}
 
+	/**
+	 * Creates the initial variables to be used in the cplex instance. 
+	 * @throws IloException
+	 */
 	private void initVars() throws IloException{
 		List<IloNumVar> varList = new ArrayList<IloNumVar>();
 		
@@ -177,6 +200,10 @@ public class GameSolver {
 		cplex.add(varList.toArray(v));
 	}
 	
+	/**
+	 * This function calls a set of helper functions to set the constraints for the optimization problem. 
+	 * @throws IloException
+	 */
 	private void initConstraints() throws IloException{
 		constraints = new ArrayList<IloRange>();
 		
@@ -200,6 +227,10 @@ public class GameSolver {
 		cplex.add(constraints.toArray(c));
 	}
 
+	/**
+	 * Initialize the objective function from the deception game instance. 
+	 * @throws IloException
+	 */
 	private void initObjective() throws IloException{
 		//Should be correct objective
 		IloNumExpr expr = dutility;

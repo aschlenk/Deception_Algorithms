@@ -1,4 +1,4 @@
-package solvers;
+package OldSolvers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import models.*;
+import solvers.GreedyMaxMinSolver;
 
 public class BBSearch {
 	

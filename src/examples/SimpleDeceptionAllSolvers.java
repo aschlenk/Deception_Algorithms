@@ -11,13 +11,13 @@ import java.util.Random;
 
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
+import OldSolvers.BBMarginalSearch;
+import OldSolvers.BBSearch;
+import OldSolvers.BBSigmaSearch;
 import Utilities.DeceptionGameHelper;
 import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
-import solvers.BBMarginalSearch;
-import solvers.BBSearch;
-import solvers.BBSigmaSearch;
 import solvers.BisectionAlgorithm;
 import solvers.BisectionAlgorithmMILP;
 import solvers.GameSolver;
@@ -73,7 +73,7 @@ public class SimpleDeceptionAllSolvers {
 
 			// runSampleLinearGame(g, numConfigs, numObs, numSystems, seed);
 
-//			runSampleGame(g, numConfigs, numObs, numSystems, seed);
+			runSampleGame(g, numConfigs, numObs, numSystems, seed);
 
 			// System.out.println();
 			// System.out.println();

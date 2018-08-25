@@ -1,4 +1,4 @@
-package solvers;
+package OldSolvers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +10,7 @@ import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.ObservableEU;
 import models.Systems;
+import solvers.GreedyMaxMinSolver;
 
 public class BBSigmaSearch {
 	

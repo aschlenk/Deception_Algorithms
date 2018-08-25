@@ -1,4 +1,4 @@
-package solvers;
+package OldSolvers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import models.BranchVariable;
 import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
+import solvers.BisectionAlgorithm;
 
 public class BBSigmaNode implements Comparable{
 	

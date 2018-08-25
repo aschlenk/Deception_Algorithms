@@ -1,4 +1,4 @@
-package solvers;
+package OldSolvers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +11,8 @@ import models.MarginalObservable;
 import models.ObservableConfiguration;
 import models.ObservableEU;
 import models.Systems;
+import solvers.GameSolver;
+import solvers.GreedyMaxMinSolver;
 
 public class BBMarginalSearch {
 	

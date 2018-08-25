@@ -19,8 +19,15 @@ To generate a random game instance, create a new instance of DeceptionGame and c
 ##### Using the optimization algorithms to solve a Cyber Deception Game
 
 
-First, the cplex library needs to be loaded before running an optimization algorithm to solve for the prescribed deceptive policy.  After Cplex is loaded, the library solvers/GameSolver.java can be called to run the regular Mixed-integer Linear Program to solve for the optimal policy with various parameters that can be set as described in the documentation.  The Greedy Min-Max solver used as the heuristic algorithm can be run by using solvers/GreedyMinMaxSolver.java.  
+First, the cplex library needs to be loaded before running an optimization algorithm to solve for the prescribed deceptive policy.  After Cplex is loaded, the library src/solvers/GameSolver.java can be called to run the regular Mixed-integer Linear Program to solve for the optimal policy with various parameters that can be set as described in the documentation.  The Greedy Min-Max solver used as the heuristic algorithm can be run by using src/solvers/GreedyMinMaxSolver.java.  
 
+To run the algorithms to solve for the optimal policy against a naive adversary, the library src/solvers/NaiveSolver.java can be used.  This library has two versions of the solver.  One solves for the optimal policy without cost and the other solves for it with cost. 
+
+
+
+##### Optimization Solvers included in Chapter Version of Paper
+
+There is also the Mixed-integer Linear Programming bisection algorithm which is included in this optimization library.  This includes a version of the bisection algorithm which solves a LP at each step of the algorithm instead of a MILP.  The algorithms can be accessed by calling the Bisection src/solvers/BisectionMILP.java and src/solvers/Bisection.java. 
 
 
 

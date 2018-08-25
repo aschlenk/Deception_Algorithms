@@ -6,8 +6,7 @@ import java.util.Map;
 import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
-import solvers.BisectionAlgorithm;
-import solvers.PureStrategySolver;
+import solvers.Bisection;
 
 public class BBNode implements Comparable {
 
@@ -58,7 +57,7 @@ public class BBNode implements Comparable {
 	
 	public void solve() throws Exception{
 		if(!isLeaf){
-			BisectionAlgorithm alg = new BisectionAlgorithm(game);//, constraints);
+			Bisection alg = new Bisection(game);//, constraints);
 			
 			alg.solve();
 			

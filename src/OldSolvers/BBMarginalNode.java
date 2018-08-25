@@ -8,7 +8,7 @@ import models.DeceptionGame;
 import models.MarginalObservable;
 import models.ObservableConfiguration;
 import models.Systems;
-import solvers.BisectionAlgorithm;
+import solvers.Bisection;
 
 public class BBMarginalNode implements Comparable{
 
@@ -77,7 +77,7 @@ private DeceptionGame game;
 	public void solve() throws Exception{
 //		System.out.println("Solving Node");
 		
-		BisectionAlgorithm alg = new BisectionAlgorithm(game, upperBoundConstraints, lowerBoundConstraints);
+		Bisection alg = new Bisection(game, upperBoundConstraints, lowerBoundConstraints);
 		
 		alg.solve();
 		

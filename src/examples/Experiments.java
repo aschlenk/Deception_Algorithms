@@ -10,15 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import OldSolvers.GameSolverCuts;
 import Utilities.DeceptionGameHelper;
 import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
-import solvers.BisectionAlgorithm;
+import solvers.Bisection;
 import solvers.GameSolver;
-import solvers.GameSolverCuts;
 import solvers.GreedyMaxMinSolver;
-import solvers.UniformEstimation;
+import solvers.NaiveSolver;
 
 public class Experiments {
 
@@ -169,7 +169,7 @@ public class Experiments {
 		
 		double start = System.currentTimeMillis();
 		
-		UniformEstimation solver = new UniformEstimation(game);
+		NaiveSolver solver = new NaiveSolver(game);
 		
 		solver.solve();
 		
@@ -230,7 +230,7 @@ public class Experiments {
 		
 		Map<ObservableConfiguration, Integer> bounds = new HashMap<ObservableConfiguration, Integer>();
 		
-		BisectionAlgorithm alg = new BisectionAlgorithm(game);
+		Bisection alg = new Bisection(game);
 		
 		alg.solve();
 		

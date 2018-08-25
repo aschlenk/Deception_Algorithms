@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import OldSolvers.generateStates;
 import Utilities.DeceptionGameHelper;
 import models.Configuration;
 import models.DeceptionGame;
@@ -13,7 +14,6 @@ import models.ObservableConfiguration;
 import models.Strategy;
 import models.Systems;
 import solvers.GameSolver;
-import solvers.generateStates;
 
 public class SimpleDeception {
 

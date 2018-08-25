@@ -1,4 +1,4 @@
-package solvers;
+package OldSolvers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,14 +17,13 @@ import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
 
-public class LinearGameSolver {
+public class MarginalSolver {
 	
 	private DeceptionGame model;
 	
 	private IloCplex cplex;
 	
-	private Map<Systems, Map<ObservableConfiguration, IloNumVar>> sigmaMap;
-	private Map<Systems, Map<ObservableConfiguration, IloNumVar>> zMap;
+	private Map<Systems, Map<ObservableConfiguration, IloNumVar>> nMap;
 	private IloNumVar dutility;
 	//private Map<ObservableConfiguation, IloNumVar> dMap;
 	
@@ -40,13 +39,19 @@ public class LinearGameSolver {
 	
 	private double defenderUtility;
 	
-	public LinearGameSolver(DeceptionGame g){
+	private Map<ObservableConfiguration, Integer> bounds;
+	
+	public MarginalSolver(DeceptionGame g){
 		this.model = g;
 	}
 	
+	public MarginalSolver(DeceptionGame g, Map<ObservableConfiguration, Integer> bounds){
+		this.model = g;
+		this.bounds = bounds;
+	}
+	
 	private void loadProblem() throws IloException{
-		sigmaMap = new HashMap<Systems, Map<ObservableConfiguration, IloNumVar>>();
-		zMap = new HashMap<Systems, Map<ObservableConfiguration, IloNumVar>>();
+		nMap = new HashMap<Systems, Map<ObservableConfiguration, IloNumVar>>();
 		
 		cplex = new IloCplex();
 		cplex.setName("DECEPTION");
@@ -87,8 +92,7 @@ public class LinearGameSolver {
 		runtime = (System.currentTimeMillis()-start)/1000.0;
 		
 		//printStrategy(defenderStrategy);
-//		printCompactStrategy(defenderStrategy);
-		printCompactStrategy(defenderStrategy, model);
+		printCompactStrategy(defenderStrategy);
 		printExpectedUtility(defenderStrategy);
 		//riskCategoryCoverage = calculateRiskCategoryCoverage();
 		//defenderPayoffs = getDefenderPayoffs();
@@ -108,25 +112,12 @@ public class LinearGameSolver {
 		
 		//Create variables for defender's strategy
 		for(Systems k : model.machines){
-			sigmaMap.put(k, new HashMap<ObservableConfiguration, IloNumVar>());
+			nMap.put(k, new HashMap<ObservableConfiguration, IloNumVar>());
 			
 			for(ObservableConfiguration o : model.obs){
 				IloNumVar var = cplex.numVar(0, 1, IloNumVarType.Float, "n_k" +  k.id + "_o" + o.id);
 				
-				sigmaMap.get(k).put(o, var);
-				varList.add(var);
-			}
-		}
-		
-		//create z variables
-		for(Systems k : model.machines){
-			zMap.put(k, new HashMap<ObservableConfiguration, IloNumVar>());
-			
-			for(ObservableConfiguration o : model.obs){
-				//TODO: check this value! Might be better bounds although it might not matter
-				IloNumVar var = cplex.numVar(-MM, MM, IloNumVarType.Float, "Z_k" +  k.id + "_o" + o.id); 
-				
-				zMap.get(k).put(o, var);
+				nMap.get(k).put(o, var);
 				varList.add(var);
 			}
 		}
@@ -153,8 +144,8 @@ public class LinearGameSolver {
 		setUtilityConstraints();
 		//Need to set single observable per system constraint
 		sumObservableConfigurationRow();
-		//Need to set z constraints
-		setZConstraints();
+		//Need to set bounds
+		setObservableBounds();
 		//Set 0 value constraints for observables that can't be assigned to a system
 		setZeroConstraints();
 		
@@ -174,13 +165,27 @@ public class LinearGameSolver {
 		//This is going to be in terms of the z contraints for each \tilde{f} \in \tilde{F}
 		for(ObservableConfiguration o : model.obs){
 			IloNumExpr expr = cplex.constant(0.0);
+			expr = cplex.sum(expr, cplex.prod(bounds.get(o), dutility));
 			
 			for(Systems k : model.machines){
-				expr = cplex.sum(expr, cplex.diff(zMap.get(k).get(o), cplex.prod(k.f.utility, sigmaMap.get(k).get(o))));
+				expr = cplex.diff(expr, cplex.prod(k.f.utility, nMap.get(k).get(o)));
 			}
 			
 			constraints.add(cplex.le(expr, 0.0, "UTILITY_TF_"+o.id));
 		}
+		
+	}
+	
+	private void setObservableBounds() throws IloException{
+		for(ObservableConfiguration o : bounds.keySet()){
+			IloNumExpr expr = cplex.constant(0.0);
+			
+			for(Systems k : model.machines){
+				expr = cplex.sum(expr, nMap.get(k).get(o));
+			}
+			constraints.add(cplex.eq(expr, bounds.get(o), "EQUAL_o"+o.id));
+		}
+		
 		
 	}
 
@@ -190,7 +195,7 @@ public class LinearGameSolver {
 			for(ObservableConfiguration o : model.obs){
 				if(!o.configs.contains(k.f)){
 				//if(!k.f.obsConfigs.contains(o)){
-					IloNumExpr expr = sigmaMap.get(k).get(o);
+					IloNumExpr expr = nMap.get(k).get(o);
 					
 					constraints.add(cplex.eq(expr, 0, "ZERO_K"+k.id+"_O"+o.id));
 				}
@@ -198,66 +203,12 @@ public class LinearGameSolver {
 		}
 	}
 
-	private void setZConstraints() throws IloException {
-		//Four constraints to add for each z variable in zMap
-		
-		//(1) ubar{u_{delta}} leq z_{k,\tilde{f}} leq 0
-		for(Systems k : model.machines){
-			for(ObservableConfiguration o : model.obs){
-				//Left side of contraint
-				IloNumExpr expr = cplex.constant(0.0);
-				expr = cplex.sum(expr, cplex.diff(minUtility, zMap.get(k).get(o)));
-				
-				constraints.add(cplex.le(expr, 0, "Z1_LEFT_K"+k.id+"_O"+o.id));
-				
-				//Right side of constraint
-				IloNumExpr expr1 = zMap.get(k).get(o);
-				//expr = cplex.sum(expr, cplex.diff(minUtility, zMap.get(k).get(o)));
-				
-				constraints.add(cplex.le(expr1, 0, "Z1_RIGHT_K"+k.id+"_O"+o.id));
-			}
-		}
-		
-		// (2) ubar{u_{\delta}} * sigma_{k,\tilde{f}} leq 0
-		for (Systems k : model.machines) {
-			for (ObservableConfiguration o : model.obs) {
-				IloNumExpr expr = cplex.constant(0.0);
-				expr = cplex.sum(expr, cplex.prod(minUtility, sigmaMap.get(k).get(o)));
-				expr = cplex.diff(expr, zMap.get(k).get(o));
-
-				constraints.add(cplex.le(expr, 0, "Z2_K" + k.id + "_O" + o.id));
-			}
-		}
-
-		// (3) u_{\delta} leq z_{k,\tilde{f}} leq u_[\delta} - (1 - sigma_{k,\tilde{f}}) ubaru_{\delta}
-		// z_k,\tilde{f} -d + ubar{u_\delta}\simga_k,\tilde{f}  \leq -ubar{u_{\delta}}
-		for (Systems k : model.machines) {
-			for (ObservableConfiguration o : model.obs) {
-				// Left side of contraint
-				IloNumExpr expr = cplex.constant(0.0);
-				expr = cplex.sum(expr, cplex.diff(dutility, zMap.get(k).get(o)));
-
-				constraints.add(cplex.le(expr, 0, "Z3_LEFT_K" + k.id + "_O" + o.id));
-
-				// Right side of constraint
-				IloNumExpr expr1 = cplex.diff(zMap.get(k).get(o), dutility);//zMap.get(k).get(o);
-				//expr1 = cplex.diff(expr, zMap.get(k).get(o));//dutility);
-				//expr1 = cplex.sum(expr1, -minUtility);
-				expr1 = cplex.sum(expr1, cplex.prod(minUtility, sigmaMap.get(k).get(o)));
-				//expr1 = cplex.sum(expr, cplex.diff(minUtility, cplex.prod(minUtility, sigmaMap.get(k).get(o))));
-				
-				constraints.add(cplex.le(expr1, -minUtility, "Z3_RIGHT_K" + k.id + "_O" + o.id));
-			}
-		}
-		
-	}
-
 	private void sumObservableConfigurationRow() throws IloException {
 		for(Systems k : model.machines){
 			IloNumExpr expr = cplex.constant(0.0);
 			
 			for(ObservableConfiguration o : model.obs){
-				expr = cplex.sum(expr, sigmaMap.get(k).get(o));
+				expr = cplex.sum(expr, nMap.get(k).get(o));
 			}
 			
 			constraints.add(cplex.eq(1.0, expr, "EQ_K"+k.id));
@@ -285,10 +236,10 @@ public class LinearGameSolver {
 	public Map<Systems, Map<ObservableConfiguration, Double>> getDefenderStrategy() throws UnknownObjectException, IloException{
 		Map<Systems, Map<ObservableConfiguration, Double>> strat = new HashMap<Systems, Map<ObservableConfiguration, Double>>();
 		
-		for(Systems k : sigmaMap.keySet()){
+		for(Systems k : nMap.keySet()){
 			strat.put(k, new HashMap<ObservableConfiguration, Double>());
-			for(ObservableConfiguration o : sigmaMap.get(k).keySet()){
-				strat.get(k).put(o, cplex.getValue(sigmaMap.get(k).get(o))); 
+			for(ObservableConfiguration o : nMap.get(k).keySet()){
+				strat.get(k).put(o, cplex.getValue(nMap.get(k).get(o))); 
 				//System.out.println(k.id+"  :  "+o.id+"  :  "+((int) cplex.getValue(sigmaMap.get(k).get(o))));
 			}
 		}
@@ -317,24 +268,6 @@ public class LinearGameSolver {
 		}
 	}
 	
-	public static void printCompactStrategy(Map<Systems, Map<ObservableConfiguration, Double>> strat, DeceptionGame g){
-
-		for(ObservableConfiguration o : g.obs){
-			double sum =0;
-			for(Systems k : strat.keySet()){
-				sum += strat.get(k).get(o);
-			}
-			System.out.println("O"+o.id+": "+sum);
-//			System.out.println();
-			/*for(Systems k : strat.keySet()){
-				if(strat.get(k).get(o) > .999)
-					System.out.print("k"+k.id+" ");
-			}
-			System.out.println();*/
-		}
-		
-	}
-	
 	public double getRuntime(){
 		return runtime;
 	}
@@ -356,6 +289,18 @@ public class LinearGameSolver {
 			total=0;
 		}
 		
+	}
+	
+	public void deleteVars() throws IloException{
+		nMap.clear();
+		
+		constraints.clear();
+		
+		if(cplex != null)
+			cplex.end();
+		//cplex.clearModel();
+		
+		cplex = null;
 	}
 	
 }

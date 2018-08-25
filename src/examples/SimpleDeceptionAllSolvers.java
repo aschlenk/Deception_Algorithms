@@ -14,20 +14,20 @@ import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import OldSolvers.BBMarginalSearch;
 import OldSolvers.BBSearch;
 import OldSolvers.BBSigmaSearch;
+import OldSolvers.GameSolverCuts;
+import OldSolvers.HeuristicSolver;
+import OldSolvers.LinearGameSolver;
+import OldSolvers.MarginalSolver;
+import OldSolvers.PureStrategySolver;
 import Utilities.DeceptionGameHelper;
 import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
-import solvers.BisectionAlgorithm;
-import solvers.BisectionAlgorithmMILP;
+import solvers.Bisection;
+import solvers.BisectionMILP;
 import solvers.GameSolver;
-import solvers.GameSolverCuts;
 import solvers.GreedyMaxMinSolver;
-import solvers.HeuristicSolver;
-import solvers.LinearGameSolver;
-import solvers.MarginalSolver;
-import solvers.PureStrategySolver;
-import solvers.UniformEstimation;
+import solvers.NaiveSolver;
 import solvers.UpperBoundMILP;
 
 public class SimpleDeceptionAllSolvers {
@@ -138,7 +138,7 @@ public class SimpleDeceptionAllSolvers {
 
 		Map<ObservableConfiguration, Integer> bounds = new HashMap<ObservableConfiguration, Integer>();
 
-		BisectionAlgorithm alg = new BisectionAlgorithm(g);
+		Bisection alg = new Bisection(g);
 
 		alg.solve();
 
@@ -288,7 +288,7 @@ public class SimpleDeceptionAllSolvers {
 			obs = null;
 
 			// Gets a marginal strategy
-			BisectionAlgorithm alg = new BisectionAlgorithm(g, setMaskings);
+			Bisection alg = new Bisection(g, setMaskings);
 
 			alg.solve();
 
@@ -502,7 +502,7 @@ public class SimpleDeceptionAllSolvers {
 
 	private static void runUniformEstimationCost(DeceptionGame g, int numConfigs, int numObservables, int numSystems,
 			long seed) throws Exception {
-		UniformEstimation solver = new UniformEstimation(g, true);
+		NaiveSolver solver = new NaiveSolver(g, true);
 
 		solver.solve();
 
@@ -530,7 +530,7 @@ public class SimpleDeceptionAllSolvers {
 
 	private static void runUniformEstimation(DeceptionGame g, int numConfigs, int numObservables, int numSystems,
 			long seed) throws Exception {
-		UniformEstimation solver = new UniformEstimation(g);
+		NaiveSolver solver = new NaiveSolver(g);
 
 		solver.solve();
 
@@ -627,7 +627,7 @@ public class SimpleDeceptionAllSolvers {
 		// System.out.println(bounds.toString());
 		// System.out.println();
 
-		BisectionAlgorithmMILP alg = new BisectionAlgorithmMILP(g);
+		BisectionMILP alg = new BisectionMILP(g);
 
 		alg.setMaxRuntime(600);
 		
@@ -672,7 +672,7 @@ public class SimpleDeceptionAllSolvers {
 		// System.out.println(bounds.toString());
 		// System.out.println();
 
-		BisectionAlgorithm alg = new BisectionAlgorithm(g);
+		Bisection alg = new Bisection(g);
 
 		alg.solve();
 

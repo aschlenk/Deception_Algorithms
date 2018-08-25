@@ -12,7 +12,7 @@ import models.ObservableConfiguration;
 import models.ObservableEU;
 
 
-public class UniformEstimation {
+public class NaiveSolver {
 	
 	private DeceptionGame game;
 	
@@ -22,7 +22,7 @@ public class UniformEstimation {
 	private ObservableConfiguration tfCover;
 	private boolean cost;
 	
-	public UniformEstimation(DeceptionGame game){
+	public NaiveSolver(DeceptionGame game){
 		this.game = game;
 		cost = false;
 		sigma = new HashMap<Systems, Map<ObservableConfiguration, Integer>>();
@@ -34,7 +34,7 @@ public class UniformEstimation {
 		}
 	}
 	
-	public UniformEstimation(DeceptionGame game, boolean cost){
+	public NaiveSolver(DeceptionGame game, boolean cost){
 		this.game = game;
 		this.cost = cost;
 		sigma = new HashMap<Systems, Map<ObservableConfiguration, Integer>>();

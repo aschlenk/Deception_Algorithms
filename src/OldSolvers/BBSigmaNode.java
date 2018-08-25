@@ -8,7 +8,7 @@ import models.BranchVariable;
 import models.DeceptionGame;
 import models.ObservableConfiguration;
 import models.Systems;
-import solvers.BisectionAlgorithm;
+import solvers.Bisection;
 
 public class BBSigmaNode implements Comparable{
 	
@@ -90,7 +90,7 @@ public class BBSigmaNode implements Comparable{
 	public void solve() throws Exception{
 		//Run Bisection algorithm for node given the constraints on values of n_k,tf
 		//if(!isLeaf){
-			BisectionAlgorithm alg = new BisectionAlgorithm(game, constraints, true);
+			Bisection alg = new Bisection(game, constraints, true);
 			
 			alg.solve();
 			

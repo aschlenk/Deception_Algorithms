@@ -1,0 +1,127 @@
+create default
+set default default tcp action reset
+set default default udp action reset
+set default default icmp action reset
+
+create winxp
+set winxp personality "Microsoft Windows XP Professional SP1"
+set winxp default tcp action reset
+add winxp tcp port 135 open
+add winxp tcp port 139 open
+add winxp tcp port 445 open
+
+create win2008
+set winxp default tcp action reset
+set winxp default udp action reset
+set winxp personality "Microsoft Windows Server 2008 SP2"
+add winxp tcp port 135 open
+add winxp tcp port 139 open
+add winxp tcp port 445 open
+
+create win2k
+set win2k personality "Microsoft Windows 2000 SP4"
+set win2k default tcp action reset
+add win2k tcp port 135 open
+add win2k tcp port 139 open
+add win2k tcp port 445 open
+add win7ent tcp port 21 "sh scripts/win32/win2k/msftp.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 25 "sh scripts/win32/win2k/exchange-smtp.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 80 "sh scripts/win32/win2k/iis.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 110 "sh scripts/win32/win2k/exchange-pop3.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 143 "sh scripts/win32/win2k/exchange-imap.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 389 "sh scripts/win32/win2k/ldap.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 5901 "sh scripts/win32/win2k/vnc.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 161 "perl scripts/unix/general/snmp/fake-snmp.pl public private --config=scripts/unix/general"
+
+create win7ent
+set win7ent tcp action reset
+set win7ent personality "Microsoft Windows 7 Enterprise"
+add win7ent tcp port 80 "sh scripts/win32/win2k/iis.sh $ipsrc $sport $ipdst $dport"
+add win7ent tcp port 135 open
+add win7ent tcp port 139 open
+add win7ent tcp port 445 open
+
+create win7pro
+set win7pro default tcp action reset
+set win7pro personality "Microsoft Windows 7 Professional"
+add win7pro tcp port 80 "sh scripts/win32/win2k/iis.sh $ipsrc $sport $ipdst $dport"
+
+
+create openwrt
+set openwrt default tcp action reset
+set openwrt personality "OpenWRT (Linux 3.0)"
+add openwrt tcp port 22 open
+
+create xbox
+set xbox default tcp action reset
+set xbox personality "Microsoft Xbox game console (modified, running XboxMediaCenter)"
+add xbox tcp port 22 open
+
+create winxpemb
+set winxpemb default tcp action reset
+set winxpemb personality "Microsoft Windows XP Embedded"
+add win7ent tcp port 135 open
+add win7ent tcp port 139 open
+add win7ent tcp port 445 open
+
+create avayagw
+set avayagw default tcp action reset
+set avayagw personality "Avaya G350 Media Gateway (VoIP gateway)"
+add avayagw tcp port 22 open
+
+create freebsd
+set freebsd default tcp action reset
+set freebsd personality "FreeBSD 8.2-STABLE"
+add freebsd tcp port 22 open
+
+create ubuntu8
+set ubuntu8 default tcp action reset
+set ubuntu8 personality "Linux 2.6.22 (Ubuntu 8.04 Server Edition)"
+add ubuntu8 tcp port 22 open
+
+create slackware
+set slackware default tcp action reset
+set slackware personality "Linux 2.6.18 (Slackware 11.0)"
+add slackware tcp port 22 open
+
+#Magical Ethernet addresses are required
+set winxp ethernet "00:00:24:ab:ca:fe"
+set win2008 ethernet "00:00:24:ab:8c:12"
+set win2k ethernet "00:00:24:ab:8c:13"
+set win7pro ethernet "00:00:24:ab:8c:14"
+set win7ent ethernet "00:00:24:ab:8c:15"
+set openwrt ethernet "00:00:24:ab:8c:16"
+set winxpemb ethernet "00:00:24:ab:8c:17"
+set avayagw ethernet "00:00:24:ab:8c:18"
+set freebsd ethernet "00:00:24:ab:8c:19"
+set ubuntu8 ethernet "00:00:24:ab:8c:20"
+set xbox ethernet "00:00:24:ab:8c:21"
+set slackware ethernet "00:00:24:ab:8c:22"
+
+
+bind 192.168.0.100 winxp
+bind 192.168.0.101 win2008
+bind 192.168.0.102 win2k
+bind 192.168.0.103 win7pro
+bind 192.168.0.104 win7ent
+bind 192.168.0.105 openwrt
+bind 192.168.0.106 xbox
+bind 192.168.0.107 winxpemb
+bind 192.168.0.108 avayagw
+bind 192.168.0.109 freebsd
+bind 192.168.0.110 ubuntu8
+bind 192.168.0.111 slackware
+
+
+
+
+
+
+
+
+
+
+
+
+
+
